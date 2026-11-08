@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: ${POSTGRES_CONTAINER_NAME:-easykit-postgres}
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-easykit_db}
+      POSTGRES_USER: ${POSTGRES_USER:-easykit_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required in .env}
+
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+
+    volumes:
+      # Persistent database storage
+      - postgres_data:/var/lib/postgresql/data
+      # Initial database setup scripts (auto-executed on container creation)
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+      # Data/Seed folder mount for manual or scripted data population
+      - ./data:/data:ro
+      # Local backups directory mount
+      - ${BACKUP_DIR:-./backups}:/backups
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER:-easykit_user} -d $${POSTGRES_DB:-easykit_db}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    stop_grace_period: 30s
+
+volumes:
+  postgres_data:
+    name: easykit-postgres-data

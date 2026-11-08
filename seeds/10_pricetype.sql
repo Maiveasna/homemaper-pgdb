@@ -1,0 +1,14 @@
+-- Seed: priceType
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM "priceType") THEN
+    INSERT INTO "priceType"
+      ("id", "title", "isActive", "createdBy", "isDefault")
+    VALUES
+      ('00000000-0000-0000-0000-000000000001', 'Rent Per Month', true, '00000000-0000-0000-0000-000000000001', true),
+      ('00000000-0000-0000-0000-000000000002', 'Rent Per Night', true, '00000000-0000-0000-0000-000000000001', false),
+      ('00000000-0000-0000-0000-000000000003', 'Rent Per Day', false, '00000000-0000-0000-0000-000000000000', false),
+      ('00000000-0000-0000-0000-000000000004', 'Rent Per 3 Hour', true, '00000000-0000-0000-0000-000000000001', false),
+      ('00000000-0000-0000-0000-000000000005', 'Sale', true, '00000000-0000-0000-0000-000000000001', false);
+  END IF;
+END $$;
